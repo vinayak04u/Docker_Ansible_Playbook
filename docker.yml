@@ -1,0 +1,38 @@
+- hosts: all
+  tasks:
+      - yum_repository: 
+              description: "repo for docker"
+              name: docker-ce
+              baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
+              gpgcheck: no
+      - command:      
+              cmd: "yum install docker-ce --nobest -y"
+      - service:
+              name: docker
+              state: started
+      - service:
+              name: "httpd"
+              state: started
+      - command:
+              cmd: "pip3 install docker api"
+      - docker_image:
+              name: "httpd:latest"
+              source: pull
+
+      - docker_container:
+              name: "webserver"
+              image: "httpd"
+              volumes: 
+                  - "/var/www/html/:/usr/local/apache2/htdocs"
+              ports: 
+                  - "17:80"
+              state: started
+              restart: yes
+              detach: yes
+      - copy:
+              src: "/myhtml.html"
+              dest: "/var/www/html"
+
+
+
+
